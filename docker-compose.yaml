@@ -1,0 +1,71 @@
+version: '2'
+
+services:
+  nats: 
+    image: 'nats:latest'
+    expose: 
+      - "4222"
+      - "6222"
+      - "8222"
+    ports: 
+      - "8222:8222"
+      - "6222:6222"
+      - "4222:4222"
+    hostname: nats-server
+  receive:
+    build: ./node_receive/
+    ports:
+     - "8000:8000"
+    volumes:
+     - .:/node_receive/
+    links: 
+     - nats
+    depends_on: 
+     - nats 
+  send:
+    build: ./node_send/
+    ports:
+     - "3000:3000"
+    volumes:
+     - .:/node_send/
+    links: 
+     - nats
+    depends_on: 
+     - nats
+
+
+#       version: "2"
+
+# services:
+#   nats:
+#     image: 'nats:0.8.0'
+#     entrypoint: "/gnatsd -DV"
+#     expose:
+#       - "4222"
+#     ports:
+#       - "8222:8222"
+#     hostname: nats-server
+#   api:
+#     build:
+#       context: "./api"
+#     entrypoint: /go/api-server
+#     links:
+#       - nats
+#     environment:
+#       - "NATS_URI=nats://nats:4222"
+#     depends_on:
+#       - nats
+#     ports:
+#       - "8080:8080"
+#   worker:
+#     build:
+#       context: "./worker"
+#     entrypoint: /go/worker
+#     links:
+#       - nats
+#     environment:
+#       - "NATS_URI=nats://nats:4222"
+#     depends_on:
+#       - nats
+#     ports:
+#       - "8181:8181"
