@@ -16,6 +16,7 @@ services:
     build: ./node_receive/
     ports:
      - "8000:8000"
+     - "8080:8080"
     volumes:
      - .:/node_receive/
     links: 
@@ -32,6 +33,14 @@ services:
      - nats
     depends_on: 
      - nats
+  front: 
+    build: ./react_map/
+    ports: 
+      - "3006:3006"
+    volumes:
+      - .:/react_map/
+    depends_on:
+      - receive
 
 
 #       version: "2"

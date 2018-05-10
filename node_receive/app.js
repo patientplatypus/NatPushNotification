@@ -7,6 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var cors = require('cors');
+const WebSocket = require('ws');
+const http = require('http');
 
 var NATS = require('nats');
 var servers = ['nats://nats:4222'];
@@ -37,9 +39,69 @@ app.use(function(req, res, next) {
 //   console.log('Got a response for GPS: ' + response);
 //   // res.json({"GPSresponse":response});
 // });
+
 nats.subscribe('GPS', function(msg) {
   console.log('Received a message: ' + msg);
 });  
+
+var server = require('http').createServer();
+var io = require('socket.io')(server);
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('test', function(data){
+    console.log("im hearing: ", data);
+    socket.emit("GPS", data);
+  });
+  socket.on('subscribeGPS', function(){
+    nats.subscribe('GPS', function(GPS) {
+      console.log('Received a GPS: ' + GPS);
+      socket.emit("GPS", GPS);
+    });
+  });
+  socket.on('unsubscribeGPS', function(){
+    console.log('unsubscribing from the nats GPS connection')
+    nats.unsubscribe('GPS');
+  });
+  socket.on('closeConnection', function(){
+    console.log('closing the nats connection');
+    nats.close();
+  });
+});
+server.listen(8080);
+
+// const server = http.createServer(app);
+// const wss = new WebSocket.Server({ server });
+
+// wss.on('connect', function connection(ws, req) {
+//   console.log("inside wss")
+//   console.log("and value of req: ", req)
+//   console.log("and value of ws: ", ws)
+  
+//   ws.on('subscribeGPS', function incoming(message){
+//     console.log('received: %s', message);
+//     nats.subscribe('GPS', function(GPS) {
+//       console.log('Received a GPS: ' + GPS);
+//       ws.send(JSON.stringify({"natsConnection": "dataReceived", "data":GPS}))
+//     });
+//   })
+//   ws.on('unsubscribeGPS', function incoming(message){
+//     console.log('received: %s', message);
+//     nats.unsubscribe('GPS');
+//     ws.send(JSON.stringify({"natsConnection": "unsubscribed"}));
+//   })
+//   ws.on('closeConnection', function incoming(message){
+//     console.log('received: %s', message);
+//     nats.close();
+//     ws.send(JSON.stringify({"natsConnection": "closed"}));
+//   });
+// });
+
+// server.listen(8080, function listening() {
+//   console.log('Listening on %d', server.address().port);
+// });
+
+ 
+
 
 // error handler
 app.use(function(err, req, res, next) {
