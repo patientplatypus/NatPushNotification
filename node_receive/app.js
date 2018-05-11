@@ -46,6 +46,7 @@ nats.subscribe('GPS', function(msg) {
 
 var server = require('http').createServer();
 var io = require('socket.io')(server);
+io.set('origins', 'http://localhost:3006');
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('test', function(data){

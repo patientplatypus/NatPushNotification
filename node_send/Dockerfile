@@ -11,5 +11,9 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 
+RUN chmod 777 /usr/src/app/assets/coordout.txt
+
+
+
 EXPOSE 3000
 CMD [ "npm", "start" ]

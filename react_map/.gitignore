@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+# map key
+/src/mapkey
+
 # testing
 /coverage
 
