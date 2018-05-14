@@ -8,6 +8,7 @@ import io from 'socket.io-client'
 // import mapboxgl from 'mapbox-gl';
 import ReactMapboxGl, { Layer, Feature, Marker } from "react-mapbox-gl";
 import styled from 'styled-components';
+import glamorous from 'glamorous'
 
 import key from '../../../../src/mapkey/key';
 
@@ -16,23 +17,58 @@ const MapBox = ReactMapboxGl({
 });
 
 
-const Mark = styled.div`
-  background-color: #e74c3c;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-`;
+// const Mark = styled.div`
+//   background-color: #e74c3c;
+//   border-radius: 50%;
+//   width: 10px;
+//   height: 10px;
+// `;
 
+// const MainMark = styled.div`
+//   background-color: green;
+//   border-radius: 50%;
+//   width: 10px;
+//   height: 10px;
+// `;
+
+// const BigLink = glamorous.a({
+// 	border: '1px solid #F67982',
+// 	width: '11em',
+// 	padding: '0.7em 0',
+// 	textDecoration: 'none',
+// 	borderRadius: 4,
+// 	display: 'inline-block',
+// 	margin: '.5em 1em',
+// 	transition: 'all .3s',
+// }, ({primary}) => ({
+// 		backgroundColor: primary ? '#CC3A4B' : 'rgba(255, 255, 255, 0.5)',
+// 		color: primary ? '#fff' : '#DA233C',
+// 		':hover': {
+// 			backgroundColor: primary ? 'rgba(255, 255, 255, 0.5)' : '#CC3A4B',
+// 			color: primary ? '#DA233C' : '#fff',
+// 		}
+// }))
+
+const Mark = glamorous.div({
+    backgroundColor: "green",
+    borderRadius: "50%",
+    width: "10px",
+    height: "10px",
+  },
+  ({colorIndex})=>({
+      backgroundColor: colorIndex?"green":"red"
+  })
+)
 
 class Map extends Component {
     constructor(props){
         super(props);
         this.state = {
             GPS: [],
-            zoom: 8,
+            zoom: 10,
             center: {
-                lat: 29.4241, 
-                lng: -98.4936
+                lat: 30.2672, 
+                lng: -97.7431
             }
         }
         this.connection = null;
@@ -104,7 +140,7 @@ class Map extends Component {
             <div style={{marginLeft:"20vw"}}>
                 <MapBox
                 style="mapbox://styles/mapbox/streets-v9"
-                center={[this.state.center.lng, this.state.center.lat]}
+                center={[this.state.center.lng,this.state.center.lat]}
                 zoom={[this.state.zoom]}
                 containerStyle={{
                     height: "60vh",
@@ -112,7 +148,7 @@ class Map extends Component {
                 }}>
                     {[...Array(this.state.GPS.length)].map((x, i) =>
                         <Marker coordinates={[this.state.GPS[i][0], this.state.GPS[i][1]]}>
-                            <Mark />
+                            <Mark colorIndex={i==this.state.GPS.length-1}/>
                         </Marker>
                     )}
                 </MapBox>
